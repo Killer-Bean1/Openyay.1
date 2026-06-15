@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../services/api";
+import api, { setOnUnauthorized } from "../services/api";
 
 const AuthContext = createContext(null);
 
@@ -28,9 +28,10 @@ export function AuthProvider({ children }) {
     }
   }
 
-  function login(token) {
+  async function login(token) {
     localStorage.setItem("access_token", token);
-    fetchUser();
+    setLoading(true);
+    await fetchUser();
   }
 
   function logout() {
@@ -38,6 +39,11 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("token_type");
     setUser(null);
   }
+
+  useEffect(() => {
+    setOnUnauthorized(logout);
+    return () => setOnUnauthorized(null);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, fetchUser }}>
