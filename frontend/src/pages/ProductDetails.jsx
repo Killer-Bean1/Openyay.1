@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { productAPI, favoriteAPI } from "../services/api";
+import { productAPI, favoriteAPI, sellerAPI } from "../services/api";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
+  const [seller, setSeller] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -23,11 +24,23 @@ export default function ProductDetails() {
       const response = await productAPI.getById(id);
       setProduct(response.data);
       setError(null);
+      if (response.data.seller_id) {
+        fetchSeller(response.data.seller_id);
+      }
     } catch (err) {
       setError("Failed to load product");
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchSeller(sellerId) {
+    try {
+      const response = await sellerAPI.getContact(sellerId);
+      setSeller(response.data);
+    } catch (err) {
+      console.error("Failed to load seller info:", err);
     }
   }
 
@@ -62,14 +75,6 @@ export default function ProductDetails() {
       console.error(err);
       alert("Failed to update favorite");
     }
-  }
-
-  async function contactSeller() {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-    navigate("/messages");
   }
 
   if (loading) {
@@ -149,7 +154,7 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            <div className="flex gap-4 flex-wrap">
+            <div className="flex gap-4 flex-wrap mb-6">
               <button
                 onClick={toggleFavorite}
                 className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
@@ -160,14 +165,43 @@ export default function ProductDetails() {
               >
                 {isFavorited ? "❤️ Remove from Favorites" : "🤍 Add to Favorites"}
               </button>
-
-              <button
-                onClick={contactSeller}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
-              >
-                💬 Contact Seller
-              </button>
             </div>
+
+            {/* Seller Contact Section */}
+            {seller && (
+              <div className="border-t-2 border-gray-200 pt-6">
+                <h2 className="text-2xl font-semibold mb-4">Contact Seller</h2>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <p className="text-lg">
+                    <span className="font-semibold">Seller:</span> {seller.full_name}
+                  </p>
+
+                  <div className="flex gap-3 flex-wrap">
+                    <a
+                      href={`mailto:${seller.email}?subject=Inquiry about ${product.title}`}
+                      className="px-5 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2"
+                    >
+                      📧 Email Seller
+                    </a>
+
+                    {seller.phone_number && (
+                      <a
+                        href={`tel:${seller.phone_number}`}
+                        className="px-5 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center gap-2"
+                      >
+                        📞 Call {seller.phone_number}
+                      </a>
+                    )}
+                  </div>
+
+                  {!seller.phone_number && (
+                    <p className="text-sm text-gray-500">
+                      Phone number not available — use email to contact this seller.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

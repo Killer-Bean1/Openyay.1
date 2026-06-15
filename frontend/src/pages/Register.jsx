@@ -10,6 +10,7 @@ export default function Register() {
     password: "",
     password_confirm: "",
     role: "customer",
+    phone_number: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ export default function Register() {
         email: form.email,
         password: form.password,
         role: form.role,
+        phone_number: form.phone_number || null,
       };
 
       await authAPI.register(registerData);
@@ -120,6 +122,18 @@ export default function Register() {
                 value={form.password_confirm}
                 onChange={handleChange}
                 required
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Phone Number (optional)</label>
+              <input
+                type="tel"
+                name="phone_number"
+                placeholder="+1 (555) 123-4567"
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                value={form.phone_number}
+                onChange={handleChange}
               />
             </div>
 
