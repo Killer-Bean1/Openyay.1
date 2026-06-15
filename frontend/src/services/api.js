@@ -31,6 +31,11 @@ export const authAPI = {
   login: (data) => api.post("/auth/login", data),
 };
 
+// Seller APIs
+export const sellerAPI = {
+  getContact: (sellerId) => api.get(`/seller/${sellerId}/contact`),
+};
+
 // Product APIs
 export const productAPI = {
   getAll: (params) => api.get("/products", { params }),

@@ -21,7 +21,8 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
         full_name=user.full_name,
         email=user.email,
         password_hash=hash_password(user.password),
-        role=user.role
+        role=user.role,
+        phone_number=user.phone_number
     )
 
     db.add(new_user)
@@ -55,5 +56,20 @@ def me(current_user = Depends(get_current_user)):
         "id": current_user.id,
         "full_name": current_user.full_name,
         "email": current_user.email,
-        "role": current_user.role
+        "role": current_user.role,
+        "phone_number": current_user.phone_number
+    }
+
+
+# GET SELLER CONTACT INFO (Public)
+@router.get("/seller/{seller_id}/contact")
+def get_seller_contact(seller_id: int, db: Session = Depends(get_db)):
+    seller = db.query(User).filter(User.id == seller_id).first()
+    if not seller:
+        raise HTTPException(status_code=404, detail="Seller not found")
+    return {
+        "id": seller.id,
+        "full_name": seller.full_name,
+        "email": seller.email,
+        "phone_number": seller.phone_number
     }

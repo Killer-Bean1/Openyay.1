@@ -11,5 +11,6 @@ class User(Base):
     password_hash = Column(String, nullable=False)
 
     role = Column(String, nullable=False)  # customer / business / admin
+    phone_number = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
