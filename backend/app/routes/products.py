@@ -29,6 +29,17 @@ def create_product(
     return new_product
 
 
+# GET MY PRODUCTS (for business owners)
+@router.get("/products/mine")
+def get_my_products(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    require_business(current_user)
+    products = db.query(Product).filter(Product.seller_id == current_user.id).all()
+    return products
+
+
 # GET ALL PRODUCTS
 @router.get("/products")
 def get_products(

@@ -1,13 +1,15 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
-  const [user] = useState({
-    full_name: "User Name",
-    email: localStorage.getItem("user_email") || "user@example.com",
-    role: "customer",
-  });
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(user);
+  const [formData, setFormData] = useState({
+    full_name: user?.full_name || "",
+    email: user?.email || "",
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,10 +22,17 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("token_type");
-    window.location.href = "/login";
+    logout();
+    navigate("/login");
   };
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -66,7 +75,7 @@ export default function Profile() {
                   name="role"
                   disabled
                   className="w-full border border-gray-300 p-3 rounded-lg bg-gray-100"
-                  value={formData.role}
+                  value={user.role}
                 />
               </div>
               <div className="flex gap-4 pt-4">

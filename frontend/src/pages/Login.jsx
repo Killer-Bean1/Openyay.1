@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,8 +18,7 @@ export default function Login() {
 
     try {
       const response = await authAPI.login({ email, password });
-      localStorage.setItem("access_token", response.data.access_token);
-      localStorage.setItem("token_type", response.data.token_type);
+      login(response.data.access_token);
       navigate("/products");
     } catch (err) {
       setError(err.response?.data?.detail || "Login failed. Please try again.");
