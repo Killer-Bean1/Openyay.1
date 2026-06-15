@@ -1,17 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("access_token"));
+  const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("token_type");
-    setIsLoggedIn(false);
+    logout();
     navigate("/login");
   };
+
+  const isLoggedIn = !!user;
+  const isBusiness = user?.role === "business";
 
   return (
     <nav className="bg-purple-600 text-white shadow-lg">
@@ -34,6 +36,13 @@ export default function Navbar() {
 
           {isLoggedIn ? (
             <>
+              {isBusiness && (
+                <li>
+                  <Link to="/business-dashboard" className="hover:underline">
+                    Dashboard
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to="/favorites" className="hover:underline">
                   Favorites
@@ -100,6 +109,13 @@ export default function Navbar() {
 
             {isLoggedIn ? (
               <>
+                {isBusiness && (
+                  <li>
+                    <Link to="/business-dashboard" className="block hover:underline">
+                      Dashboard
+                    </Link>
+                  </li>
+                )}
                 <li>
                   <Link to="/favorites" className="block hover:underline">
                     Favorites
