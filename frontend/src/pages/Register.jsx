@@ -156,10 +156,3 @@ export default function Register() {
     </div>
   );
 }
-        </button>
-
-      </form>
-
-    </div>
-  );
-}
