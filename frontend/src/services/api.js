@@ -13,13 +13,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Logout handler — set by AuthProvider so the 401 interceptor uses context
+let onUnauthorized = null;
+export function setOnUnauthorized(handler) {
+  onUnauthorized = handler;
+}
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("access_token");
-      window.location.href = "/login";
+      if (onUnauthorized) {
+        onUnauthorized();
+      } else {
+        localStorage.removeItem("access_token");
+      }
     }
     return Promise.reject(error);
   }
